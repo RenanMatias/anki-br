@@ -1,4 +1,5 @@
 # Anki-BR
+
 Desvende o Poder da Repetição Espaçada! 🃏✨
 
 Seja o protagonista do seu aprendizado com os flashcards, a chave para a maestria do conhecimento. Entre em um mundo onde a memorização se torna uma jornada emocionante e eficaz. Descubra como os pequenos pedaços de papel se transformam em portais para o domínio de qualquer assunto. 📚🔑
