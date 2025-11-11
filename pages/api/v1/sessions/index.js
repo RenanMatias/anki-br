@@ -1,7 +1,10 @@
 import { createRouter } from "next-connect";
 import controller from "infra/controller.js";
 import authentication from "models/authentication.js";
+import authorization from "models/authorization.js";
 import session from "models/session.js";
+
+import { ForbiddenError } from "infra/errors.js";
 
 const router = createRouter();
 
@@ -19,6 +22,13 @@ async function postHandler(request, response) {
     userInputValues.password,
   );
 
+  if (!authorization.can(authenticatedUser, "create:session")) {
+    throw new ForbiddenError({
+      message: "Você não possui permissão para fazer login.",
+      action: "Contato o suporte caso você acredite que isto é um erro.",
+    });
+  }
+
   const newSession = await session.create(authenticatedUser.id);
 
   controller.setSessionCookie(newSession.token, response);
@@ -27,11 +37,21 @@ async function postHandler(request, response) {
 }
 
 async function deleteHandler(request, response) {
+  console.log("Deleting session...");
   const sessionToken = request.cookies.session_id;
+  console.log("Session token:", sessionToken);
 
+  console.log("Finding session by token...");
   const sessionObject = await session.findOneValidByToken(sessionToken);
+  console.log("Session found:", sessionObject.id);
+
+  console.log("Expiring session...");
   const expiredSession = await session.expireById(sessionObject.id);
+  console.log("Session expired:", expiredSession.id);
+
+  console.log("Clearing session cookie...");
   controller.clearSessionCookie(response);
+  console.log("Session cookie cleared.");
 
   return response.status(200).json(expiredSession);
 }
